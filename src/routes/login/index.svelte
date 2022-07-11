@@ -1,9 +1,40 @@
+<script lang="ts">
+	import { goto } from '$app/navigation'
+
+	import { login } from "$lib/service/auth"
+
+
+	let user = {
+		"username": "",
+		"password": ""
+	}
+	let error = ""
+
+	async function submit() {
+		let r = await login(user.username, user.password)
+		if (r.error) {
+			error = r.message
+			user.username = ""
+			user.password = ""
+		}
+		else {
+			localStorage.setItem("festival-access", r.token)
+			localStorage.setItem("festival-refresh", r.reflesh_token)
+			goto("/")
+		}
+	}
+</script>
+
+
 <svelte:head>
 	<title>Login</title>
 </svelte:head>
 
 <div class="container align-items-center mt-3">
-	<form>
+	{#if error}
+		<div class="alert alert-danger">{error}</div>
+	{/if}
+	<form on:submit|preventDefault="{submit}">
 		<div class="form-group mb-3">
 			<label for="UsernameInput">Username</label>
 			<input
@@ -12,6 +43,7 @@
 				id="UsernameInput"
 				placeholder="Input your username"
 				name="Username"
+				bind:value="{user.username}"
 			/>
 		</div>
 		<div class="form-group mb-3">
@@ -22,6 +54,7 @@
 				id="PasswordInput"
 				placeholder="Input your password"
 				name="Password"
+				bind:value="{user.password}"
 			/>
 		</div>
 		<button class="btn btn-primary">Login</button>
