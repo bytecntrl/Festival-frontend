@@ -20,4 +20,7 @@ export async function login(username: string, password: string) {
             return re
         }
     )
+    .catch(
+        (err) => console.log(err)
+    )
 }
