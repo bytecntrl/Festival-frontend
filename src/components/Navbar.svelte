@@ -1,46 +1,8 @@
 <script lang="ts">
-	import jwtDecode from 'jwt-decode';
+	import refresh_token from "$store/refresh_token";
+	import { Auth } from "$lib/auth";
 
-	import access_token from "../stores/access_token";
-	import { ROLES } from "$lib/constants";
-
-
-	$: refresh = $access_token;
-
-	interface Token {
-		username: string
-		role: string
-		exp: number
-	}
-
-	function hasRoles(): boolean {
-        if (isLoggedIn()) {
-            return ROLES.includes((jwtDecode(refresh) as Token).role);
-        }
-        return false;
-    }
-
-    function isLoggedIn(): boolean {
-        return refresh !== "" && !isTokenExpired();
-    }
-
-    function isTokenExpired(): boolean {
-        if (refresh !== ""){
-            return new Date((jwtDecode(refresh) as Token).exp *1000) < new Date();
-        }
-        return false;
-    }
-
-    function isAdmin(): boolean {
-        if (isLoggedIn()) {
-            return (jwtDecode(refresh) as Token).role == "admin"
-        }
-        return false
-    }
-
-    function getUsername(): string {
-        return (jwtDecode(refresh) as Token).username
-    }
+	$: auth = new Auth($refresh_token)
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -63,17 +25,17 @@
 				<li class="nav-item">
 					<a class="nav-link active" href="/"> Home </a>
 				</li>
-				{#if !isLoggedIn()}
+				{#if !auth.isLoggedIn()}
 					<li class="nav-item">
 						<a class="nav-link active" href="/login"> Login </a>
 					</li>
 				{/if}
-				{#if hasRoles()}
+				{#if auth.hasRoles()}
 					<li class="nav-item">
 						<a class="nav-link active" href="/order"> Order </a>
 					</li>
 				{/if}
-				{#if isAdmin()}
+				{#if auth.isAdmin()}
 					<li class="nav-item">
 						<a class="nav-link active" href="/users"> Users </a>
 					</li>
@@ -81,7 +43,7 @@
 						<a class="nav-link active" href="/products"> Products </a>
 					</li>
 				{/if}
-				{#if isLoggedIn()}
+				{#if auth.isLoggedIn()}
 					<li class="nav-item dropdown">
 						<a
 							class="nav-link dropdown-toggle"
@@ -91,7 +53,7 @@
 							data-bs-toggle="dropdown"
 							aria-expanded="false"
 						>
-							{getUsername()}
+							{auth.getUsername()}
 						</a>
 						<ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="navbarDropdown">
 							<li><a class="dropdown-item" href="/">Profile</a></li>
