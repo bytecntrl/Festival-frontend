@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 
-	import { login } from "$lib/service/auth"
+	import { login } from "$lib/auth"
 
 
 	let user = {
@@ -18,8 +18,6 @@
 			user.password = ""
 		}
 		else {
-			localStorage.setItem("festival-access", r.token)
-			localStorage.setItem("festival-refresh", r.reflesh_token)
 			goto("/")
 		}
 	}
